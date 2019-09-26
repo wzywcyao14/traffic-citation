@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Los Angeles Parking Citation Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- styles -->
+    <link href="/static/css/styles.css" rel="stylesheet">
+
+    <style>
+      #map{
+        height:400px;
+        width:100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+         <div class="container">
+            <div class="row">
+               <div class="col-md-12">
+                  <!-- Logo -->
+                  <div class="logo">
+                     <h1><a href="/">LA Parking Citation Analytics</a></h1>
+                  </div>
+               </div>
+            </div>
+         </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row">
+
+          <div class="col-md-3">
+            <div class="sidebar content-box" style="display: block;">
+                <ul class="nav">
+                    <!-- Main menu -->
+                    <li class="current"><a href="/"><i class="glyphicon glyphicon-home"></i> Home</a></li>
+
+                    <li><a href="/month"><i class="glyphicon glyphicon-stats"></i> Citation vs Month</a></li>
+                    <li><a href="/day"><i class="glyphicon glyphicon-stats"></i> Citation vs Day</a></li>
+                    <li><a href="/date"><i class="glyphicon glyphicon-stats"></i> Citation vs Date</a></li>
+                    <li><a href="/time"><i class="glyphicon glyphicon-stats"></i> Citation vs Time</a></li>
+                    <li><a href="/make"><i class="glyphicon glyphicon-stats"></i> Citation vs Make</a></li>
+                    <li><a href="/fine"><i class="glyphicon glyphicon-stats"></i> Citation vs Fine Amount</a></li>
+                    <li><a href="/map"><i class="glyphicon glyphicon-stats"></i> Citation vs Location</a></li>
+                </ul>
+             </div>
+          </div>
+
+          <div class="col-md-9">
+            <div class="row">
+
+                <div class="col-md-8">
+
+                  <!-- insert content here -->
+                  <center>
+                        <!-- <h1>{{title}}</h1> -->
+                        <div id="map"></div>
+                        <script>
+                          function initMap(){
+                            // Map options
+                            var options = {
+                              zoom:10,
+                              // zoom in at Los Angeles
+                              center:{lat:34.05,lng:-118.24}
+                            }
+
+                            // New map
+                            var map = new google.maps.Map(document.getElementById('map'), options);
+
+                            var markers = [
+                              {
+                                coords:{lat:{{lat[0]}},lng:{{lng[0]}}},
+                                content:"<p>Location:"+"{{loc[0]}}</p>"+"<p>Citation Count:"+"{{count[0]}}</p>"
+                              },
+                              {
+                                coords:{lat:{{lat[1]}},lng:{{lng[1]}}},
+                                content:"<p>Location:"+"{{loc[1]}}</p>"+"<p>Citation Count:"+"{{count[1]}}</p>"
+                              },
+                              {
+                                coords:{lat:{{lat[2]}},lng:{{lng[2]}}},
+                                content:"<p>Location:"+"{{loc[2]}}</p>"+"<p>Citation Count:"+"{{count[2]}}</p>"
+                              },
+                              {
+                                coords:{lat:{{lat[3]}},lng:{{lng[3]}}},
+                                content:"<p>Location:"+"{{loc[3]}}</p>"+"<p>Citation Count:"+"{{count[3]}}</p>"
+                              },
+                              {
+                                coords:{lat:{{lat[4]}},lng:{{lng[4]}}},
+                                content:"<p>Location:"+"{{loc[4]}}</p>"+"<p>Citation Count:"+"{{count[4]}}</p>"
+                              },
+                              {
+                                coords:{lat:{{lat[5]}},lng:{{lng[5]}}},
+                                content:"<p>Location:"+"{{loc[5]}}</p>"+"<p>Citation Count:"+"{{count[5]}}</p>"
+                              },
+                              {
+                                coords:{lat:{{lat[6]}},lng:{{lng[6]}}},
+                                content:"<p>Location:"+"{{loc[6]}}</p>"+"<p>Citation Count:"+"{{count[6]}}</p>"
+                              },
+                              {
+                                coords:{lat:{{lat[7]}},lng:{{lng[7]}}},
+                                content:"<p>Location:"+"{{loc[1]}}</p>"+"<p>Citation Count:"+"{{count[1]}}</p>"
+                              },
+                              {
+                                coords:{lat:{{lat[8]}},lng:{{lng[8]}}},
+                                content:"<p>Location:"+"{{loc[8]}}</p>"+"<p>Citation Count:"+"{{count[8]}}</p>"
+                              },
+                              {
+                                coords:{lat:{{lat[9]}},lng:{{lng[9]}}},
+                                content:"<p>Location:"+"{{loc[9]}}</p>"+"<p>Citation Count:"+"{{count[9]}}</p>"
+                              }
+                            ];
+
+                            // Loop through markers
+                            for(var i = 0;i < markers.length;i++){
+                              // Add marker
+                              addMarker(markers[i]);
+                            }
+
+                            // Add Marker Function
+                            function addMarker(props){
+                              var marker = new google.maps.Marker({
+                                position:props.coords,
+                                map:map,
+                              });
+
+                              // Check content
+                              if(props.content){
+                                var infoWindow = new google.maps.InfoWindow({
+                                  content:props.content
+                                });
+
+                                marker.addListener('click', function(){
+                                  infoWindow.open(map, marker);
+                                });
+                              }
+                            }
+                          }
+                        </script>
+                        <script async defer
+                          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5IQiNeaF180dwDcwlD_cL09eR6Z4jvtY&callback=initMap">
+                          // src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDrg2tuHGc7YPq9agpQp_f5cbc-8mNPmQE&callback=initMap">
+                        </script>
+                      </center>
+
+                </div>
+
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="content-box-header">
+                                <div class="panel-title">Description</div>
+                            </div>
+                            <div class="content-box-large box-with-header">
+                                <p align = "justify">
+                                This map shows the top locations for getting parking citations for the selected period of time.
+                                <br />
+                                </p>
+                                <!-- This chart shows the parking citation percentage of each month for a given year. -->
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="content-box-header">
+                                <div class="panel-title">Observation</div>
+                            </div>
+                            <div class="content-box-large box-with-header">
+                                  <li>  Markers contain the information about location and citation count.</li>
+                                  <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+          </div>
+
+        </div>
+    </div>
+
+    <footer>
+         <div class="container">
+
+            <div class="copy text-center">
+               Copyright 2019 <a href='/'>LA Parking Citation Analytics</a>
+            </div>
+
+         </div>
+      </footer>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/js/custom.js"></script>
+  </body>
+</html>

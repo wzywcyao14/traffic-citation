@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Los Angeles Parking Citation Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- styles -->
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+
+    <!-- <style>
+    canvas {
+        /*-moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        width:100%;
+        height:100%;
+        display:block;*/
+    }
+    </style> -->
+  </head>
+
+  <body>
+    <div class="header">
+         <div class="container">
+            <div class="row">
+               <div class="col-md-12">
+                  <!-- Logo -->
+                  <div class="logo">
+                     <h1><a href="/">LA Parking Citation Analytics</a></h1>
+                  </div>
+               </div>
+            </div>
+         </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row">
+
+          <div class="col-md-3">
+            <div class="sidebar content-box" style="display: block;">
+                <ul class="nav">
+                    <!-- Main menu -->
+                    <li class="current"><a href="/"><i class="glyphicon glyphicon-home"></i> Home</a></li>
+
+                    <li><a href="/month"><i class="glyphicon glyphicon-stats"></i> Citation vs Month</a></li>
+                    <li><a href="/day"><i class="glyphicon glyphicon-stats"></i> Citation vs Day</a></li>
+                    <li><a href="/date"><i class="glyphicon glyphicon-stats"></i> Citation vs Date</a></li>
+                    <li><a href="/time"><i class="glyphicon glyphicon-stats"></i> Citation vs Time</a></li>
+                    <li><a href="/make"><i class="glyphicon glyphicon-stats"></i> Citation vs Make</a></li>
+                    <li><a href="/fine"><i class="glyphicon glyphicon-stats"></i> Citation vs Fine Amount</a></li>
+                    <li><a href="/map"><i class="glyphicon glyphicon-stats"></i> Citation vs Location</a></li>
+                </ul>
+             </div>
+          </div>
+
+          <div class="col-md-9">
+            <div class="row">
+
+                <div class="col-md-8">
+
+                  <!-- insert content here -->
+                  <center>
+                      <!-- <h1>{{ title }}</h1> -->
+                      <canvas id="canvas" width="400" height="400"></canvas>
+                      <!-- <canvas id="canvas"></canvas> -->
+                      <script>
+
+                        // data for pie chart
+                        var pieData = [
+                          {
+                            label: "{{labels[0]}}",
+                            color: "#5093ce",
+                            highlight: "#78acd9",
+                            value: {{values[0]}}
+                          },
+                          {
+                            label: "{{labels[1]}}",
+                            color: "#c7ccd1",
+                            highlight: "#e3e6e8",
+                            value: {{values[1]}}
+                          },
+                          {
+                            label: "{{labels[2]}}",
+                            color: "#7fc77f",
+                            // highlight: "#a3d7a3",
+                            value: "{{values[2]}}"
+                          },
+                          {
+                            label: "{{labels[3]}}",
+                            color: "#fab657",
+                            // highlight: "#fbcb88",
+                            value: "{{values[3]}}"
+                          },
+                          {
+                            label: "{{labels[4]}}",
+                            color: "#eaaede",
+                            // highlight: "#f5d6ef",
+                            value: "{{values[4]}}"
+                          },
+                          {
+                            label: "{{labels[5]}}",
+                            color: "#dd6864",
+                            // highlight: "#e6918e",
+                            value: "{{values[5]}}"
+                          },
+                          {
+                            label: "{{labels[6]}}",
+                            color: "#ABCDEF",
+                            // highlight: "#e6918e",
+                            value: "{{values[6]}}"
+                          },
+                        ];
+
+                        // get pie chart canvas
+                        var ctx = document.getElementById("canvas").getContext("2d");
+                        var midX = canvas.width/2;
+                        var midY = canvas.height/2;
+                        // var midX = canvas.width;
+                        // var midY = canvas.height;
+
+
+                        // Create a pie chart
+                        var myPieChart = new Chart(ctx).Pie(pieData,{
+                            showTooltips: false,
+                            onAnimationProgress: drawSegmentValues
+                        });
+
+                        var radius = myPieChart.outerRadius;
+                        // draw labels on pie chart
+                        function drawSegmentValues()
+                        {
+                            for(var i=0; i<myPieChart.segments.length; i++)
+                            {
+                                ctx.fillStyle="black";
+                                // var textSize = canvas.width/80;
+                                var textSize = 12;
+                                ctx.font= textSize+"px Verdana";
+                                // Get needed variables
+                                var value = myPieChart.segments[i].value;
+                                var label = myPieChart.segments[i].label;
+                                var startAngle = myPieChart.segments[i].startAngle;
+                                var endAngle = myPieChart.segments[i].endAngle;
+                                var middleAngle = startAngle + ((endAngle - startAngle)/2);
+
+                                // Compute text location
+                                var posX = (radius/1.5) * Math.cos(middleAngle) + midX;
+                                var posY = (radius/1.5) * Math.sin(middleAngle) + midY;
+
+                                // Text offside by middle
+                                var w_offset = ctx.measureText(value).width/2;
+                                var h_offset = textSize/4;
+
+                                ctx.fillText(label + ':'+ value +'%', posX - 2.5*w_offset, posY + h_offset);
+                            }
+                        };
+
+                      </script>
+
+                  </center>
+
+                </div>
+
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="content-box-header">
+                                <div class="panel-title">Description</div>
+                            </div>
+                            <div class="content-box-large box-with-header">
+                                <p align = "justify">
+                                This chart shows the parking citation percentage for each day of week. Data points of 2018 are used.
+                                <br />
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="content-box-header">
+                                <div class="panel-title">Observation</div>
+                            </div>
+                            <div class="content-box-large box-with-header">
+                              <p align = "justify">
+                                  <li>  Parking citations on weekdays are significantly higher than weekends.</li>
+                                  <br />
+                                  <li>  Parking citations on Tue-Thu are higher than Mon and Fri.</li>
+                                  <br />
+                              </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+          </div>
+
+        </div>
+    </div>
+
+    <footer>
+         <div class="container">
+
+            <div class="copy text-center">
+               Copyright 2019 <a href='/'>LA Parking Citation Analytics</a>
+            </div>
+
+         </div>
+      </footer>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/js/custom.js"></script>
+  </body>
+</html>
+

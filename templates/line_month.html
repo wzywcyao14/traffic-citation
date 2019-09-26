@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Los Angeles Parking Citation Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- styles -->
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js'></script>
+    <!-- <style>
+      canvas { max-width: 600px; }
+    </style> -->
+    <style>
+      canvas {
+          width:100%;
+          height:100%;
+          display:block;
+          /*border: 1px solid blue;*/
+          background-color: white;
+          /*margin-top: 10px;*/
+          border-radius: 10px;
+          padding: 10px 2px 2px 2px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+         <div class="container">
+            <div class="row">
+               <div class="col-md-12">
+                  <!-- Logo -->
+                  <div class="logo">
+                     <h1><a href="/">LA Parking Citation Analytics</a></h1>
+                  </div>
+               </div>
+            </div>
+         </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row">
+
+          <div class="col-md-3">
+            <div class="sidebar content-box" style="display: block;">
+                <ul class="nav">
+                    <!-- Main menu -->
+                    <li class="current"><a href="/"><i class="glyphicon glyphicon-home"></i> Home</a></li>
+
+                    <li><a href="/month"><i class="glyphicon glyphicon-stats"></i> Citation vs Month</a></li>
+                    <li><a href="/day"><i class="glyphicon glyphicon-stats"></i> Citation vs Day</a></li>
+                    <li><a href="/date"><i class="glyphicon glyphicon-stats"></i> Citation vs Date</a></li>
+                    <li><a href="/time"><i class="glyphicon glyphicon-stats"></i> Citation vs Time</a></li>
+                    <li><a href="/make"><i class="glyphicon glyphicon-stats"></i> Citation vs Make</a></li>
+                    <li><a href="/fine"><i class="glyphicon glyphicon-stats"></i> Citation vs Fine Amount</a></li>
+                    <li><a href="/map"><i class="glyphicon glyphicon-stats"></i> Citation vs Location</a></li>
+                </ul>
+             </div>
+          </div>
+
+          <div class="col-md-9">
+            <div class="row">
+
+                <div class="col-md-8">
+
+                  <center>
+                    <!-- <canvas id="myChart" width="200" height="200"></canvas> -->
+                    <canvas id="myChart"></canvas>
+                    <script>
+                        var ctx = document.getElementById("myChart").getContext('2d');
+
+                        var dataLabels = [
+                          {% for item in labels %}
+                          "{{ item }}",
+                          {% endfor %}
+                        ];
+                        var dataValues1 = [
+                            {% for item in values1 %}
+                               "{{ item }}",
+                              {% endfor %}
+                        ];
+                        var dataValues2 = [
+                            {% for item in values2 %}
+                               "{{ item }}",
+                              {% endfor %}
+                        ];
+                         var dataValues3 = [
+                            {% for item in values3 %}
+                               "{{ item }}",
+                              {% endfor %}
+                        ];
+                         var dataValues4 = [
+                            {% for item in values4 %}
+                               "{{ item }}",
+                              {% endfor %}
+                        ];
+
+                        var myChart = new Chart(ctx, {
+                          type: 'line',
+                          data:
+                          {
+                            labels: dataLabels,
+                            datasets:[
+                            {
+                              label: '2016',
+                              data: dataValues1,
+                              backgroundColor: "#dd6864", //'rgba(255,0,0,0.2)',
+                              borderColor: "#dd6864", //'rgba(255,0,0,0.7)',
+                              fill: false,
+                              borderWidth: 2,
+                              pointBackgroundColor:'#dd6864',
+
+                            },
+                            {
+                              label: '2017',
+                              data: dataValues2,
+                              backgroundColor: "#fab657", //'rgba(255,255,0,0.2)',
+                              borderColor: "#fab657", //'rgba(255,255,0,0.7)',
+                              fill: false,
+                              borderWidth: 2,//
+                              pointBackgroundColor: "#fab657",//'rgba(255,255,0,0.7)',
+                            },
+                            {
+                              label: '2018',
+                              data: dataValues3,
+                              backgroundColor:"#7fc77f",// 'rgba(0,255,0,0.2)',
+                              borderColor:"#7fc77f",// 'rgba(0,255,0,0.7)',
+                              fill: false,
+                              borderWidth: 2,
+                              pointBackgroundColor:"#7fc77f",//'rgba(0,255,0,0.7)',
+                            },
+                            {
+                              label: '2019',
+                              data: dataValues4,
+                              backgroundColor: "#5093ce",//'rgba(0,0,255,0.2)',
+                              borderColor: "#5093ce",//'rgba(0,0,255,0.7)',
+                              fill: false,
+                              borderWidth: 2,
+                              pointBackgroundColor:"#5093ce",//'rgba(0,0,255,0.7)',
+                            },
+
+
+                            ]
+                          },
+                          options: {
+                            legend:{
+                              labels:{
+                                fontSize: 16,
+                                // boxWidth: 20,
+                                usePointSytle: true
+                              }
+                            },
+                            scales: {
+                              xAxes: [
+                              {
+                                display: true,
+                                ticks: {
+                                  autoSkip: false,
+                                  fontSize: 14
+                                },
+                                scaleLabel: {
+                                  display: true,
+                                  labelString: 'Month',
+                                  fontSize: 16
+                                }
+                              },
+                              ],
+                              yAxes: [
+                              {
+                                ticks: {
+                                  beginAtZero:true,
+                                  fontSize: 14
+                                },
+                                scaleLabel: {
+                                  display: true,
+                                  labelString: 'Citation Count',
+                                  fontSize: 16
+                                }
+                              }
+                              ]
+                            }
+                          }
+                        });
+
+                    </script>
+                  </center>
+
+                </div>
+
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="content-box-header">
+                                <div class="panel-title">Description</div>
+                            </div>
+                            <div class="content-box-large box-with-header">
+                                <p align = "justify">
+                                This chart shows the parking citation count for each month of recent years.
+                                <br />
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="content-box-header">
+                                <div class="panel-title">Observation</div>
+                            </div>
+                            <div class="content-box-large box-with-header">
+                                  <p align = "justify">
+                                  <li> Annual citation counts have dropped since 2017</li>
+                                  <br />
+                                  <li> Spring is the peak season for getting parking citations</li>
+                                  <br />
+                                  </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+          </div>
+
+        </div>
+    </div>
+
+    <footer>
+         <div class="container">
+
+            <div class="copy text-center">
+               Copyright 2019 <a href='/'>LA Parking Citation Analytics</a>
+            </div>
+
+         </div>
+      </footer>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/js/custom.js"></script>
+  </body>
+</html>

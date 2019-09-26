@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Los Angeles Parking Citation Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- styles -->
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.3"></script>
+
+    <style>
+    canvas {
+        width:100%;
+        height:100%;
+        display:block;
+        /*border: 1px solid blue;*/
+        background-color: white;
+        /*margin-top: 10px;*/
+        border-radius: 10px;
+        padding: 10px 2px 2px 2px;
+    }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+         <div class="container">
+            <div class="row">
+               <div class="col-md-12">
+                  <!-- Logo -->
+                  <div class="logo">
+                     <h1><a href="/">LA Parking Citation Analytics</a></h1>
+                  </div>
+               </div>
+            </div>
+         </div>
+    </div>
+
+    <div class="page-content">
+        <div class="row">
+
+          <div class="col-md-3">
+            <div class="sidebar content-box" style="display: block;">
+                <ul class="nav">
+                    <!-- Main menu -->
+                    <li class="current"><a href="/"><i class="glyphicon glyphicon-home"></i> Home</a></li>
+
+                    <li><a href="/month"><i class="glyphicon glyphicon-stats"></i> Citation vs Month</a></li>
+                    <li><a href="/day"><i class="glyphicon glyphicon-stats"></i> Citation vs Day</a></li>
+                    <li><a href="/date"><i class="glyphicon glyphicon-stats"></i> Citation vs Date</a></li>
+                    <li><a href="/time"><i class="glyphicon glyphicon-stats"></i> Citation vs Time</a></li>
+                    <li><a href="/make"><i class="glyphicon glyphicon-stats"></i> Citation vs Make</a></li>
+                    <li><a href="/fine"><i class="glyphicon glyphicon-stats"></i> Citation vs Fine Amount</a></li>
+                    <li><a href="/map"><i class="glyphicon glyphicon-stats"></i> Citation vs Location</a></li>
+                </ul>
+             </div>
+          </div>
+
+          <div class="col-md-9">
+            <div class="row">
+
+                <div class="col-md-8">
+
+                  <center>
+                      <!-- <div style="width:130%;"> -->
+                      <!-- <div style="width:100%;"> -->
+                          <!-- <canvas id="canvas"></canvas> -->
+                          <button onclick="resetZoom()">Reset Zoom</button>
+                          <button id="drag-switch" onclick="toggleDragMode()">Disable drag mode</button>
+                          <canvas id="canvas"></canvas>
+                          <!-- <canvas id="canvas" width="400" height="200"></canvas> -->
+                      <!-- </div> -->
+
+                      <script>
+                        // var timeFormat = 'MM/DD/YYYY HH:mm';
+                        // var timeFormat = 'HH:mm';
+                        // var now = window.moment();
+                        var config = {
+                            type: 'line',
+                            data: {
+                                labels : [
+                                  {% for item in labels %}
+                                    "{{ item }}",
+                                  {% endfor %}
+                                ],
+
+                                datasets : [
+                                  {
+                                    backgroundColor: 'rgba(151,187,205,0.2)',
+                                    borderColor: 'rgba(151,187,205,1)',
+                                    // fill: false,
+                                    borderWidth: 2,
+                                    pointBackgroundColor:'rgba(151,187,205,1)',
+                                    data : [
+                                      {% for item in values %}
+                                        "{{ item }}",
+                                      {% endfor %}]
+                                  }
+                                ]
+
+                            },
+                            options: {
+                                legend:{
+                                    display: false,
+                                },
+                                responsive: true,
+                                title: {
+                                    display: false,
+                                    // text: 'Total Number of Citations VS Time'
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        type: 'time',
+                                        time: {
+                                            // parser: timeFormat,
+                                            // round: 'day',
+                                            // unit: 'week',
+                                            // isoWeekday: true,
+                                            // unitStepSize: 5
+                                            // displayFormats:'ll',
+                                            // tooltipFormat: 'YYYY-MM-DD'
+                                            minUnit:'day',
+
+                                        },
+                                        ticks: {
+                                          autoSkip: true,
+                                          // fontSize: 20
+                                        },
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Date',
+                                            fontSize: 16
+                                        },
+                                        ticks: {
+                                            maxRotation: 0,
+                                        }
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                          beginAtZero:true,
+                                          fontSize: 14
+                                        },
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Citation Count',
+                                            fontSize: 16
+                                        }
+                                    }]
+                                },
+                                plugins: {
+
+                                    zoom: {
+                                        // pan:{
+                                        //     enabled:true,
+                                        //     mode:'x'
+                                        // }
+                                        zoom: {
+                                            enabled: true,
+                                            drag: true,
+                                            mode: 'x',
+                                            speed: 0.5
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+                        window.resetZoom = function() {
+                            window.myLine.resetZoom();
+                        };
+                        window.toggleDragMode = function() {
+                            var chart = window.myLine;
+                            var zoomOptions = chart.options.plugins.zoom.zoom;
+                            zoomOptions.drag = !zoomOptions.drag;
+                            chart.update();
+                            document.getElementById('drag-switch').innerText = zoomOptions.drag ? 'Disable drag mode' : 'Enable drag mode';
+                        };
+                        window.onload = function() {
+                            var ctx = document.getElementById('canvas').getContext('2d');
+                            window.myLine = new window.Chart(ctx, config);
+                        };
+                    </script>
+                  </center>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="content-box-header">
+                                <div class="panel-title">Description</div>
+                            </div>
+                            <div class="content-box-large box-with-header">
+                                <p align = "justify">
+                                This chart shows the parking citation count for different dates with zoom-in/zoom-out features. Data points of 2018 are used.
+                                <br />
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="content-box-header">
+                                <div class="panel-title">Observation</div>
+                            </div>
+                            <div class="content-box-large box-with-header">
+                                  <p align = "justify">
+                                  <li>  Repeating cycle patterns can be observed when zooming in to the time span of a few weeks.</li>
+                                  <br />
+                                  </p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+          </div>
+
+        </div>
+    </div>
+
+    <footer>
+         <div class="container">
+
+            <div class="copy text-center">
+               Copyright 2019 <a href='/'>LA Parking Citation Analytics</a>
+            </div>
+
+         </div>
+      </footer>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/js/custom.js"></script>
+  </body>
+</html>

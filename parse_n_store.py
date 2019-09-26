@@ -1,35 +1,39 @@
-import pymongo # use python to interact with mongoDB database server
-import csv # csv module to RD/WR csv data file
-import connectDB # connect to MongoDB server and create database
+import pymongo  # use python to interact with mongoDB database server
+import connectDB
+# import csv  # csv module to RD/WR csv data file
+# import json
 
-# define names for database and collection 
-databaseName = 'newDB2'
-collectionName = 'newCol2'
-
+# # define names for database and collection
+databaseName = 'citation'
+collectionName = 'record'
 # create a database in MongoDB
-collection = connectDB.dbCreation(databaseName,collectionName)
+collection = connectDB.dbCreation(databaseName, collectionName)
 
+import pandas as pd
+import numpy as np
+counter = 0
+# break the input file into specfied chunks instead of loading the whole file into memory
+df = pd.read_csv('Data/parking-citations.csv', chunksize=1000)
+counter = 0
+# print(df.get_chunk(4))
+# print(type(df))
 
-# load and parse the citation data (csv format)
-with open('Data/parking-citations.csv' ,'r') as csv_file:
-	csv_reader = csv.DictReader(csv_file)
+collection.remove()
+for chunk in df:
+    if counter == 5328:
+        break
+    else:
+        # print(type(chunk))
+        # print(chunk)
+        collection.insert_many(chunk.to_dict('records'))
+        # collection.insert_many(np.array(chunk))
+        counter += 1
+# for chunk in df:
+#     collection.insert_many(chunk.to_dict('records'))
 
-	counter = 0
-	# # store the parsed data into the created collection
-	# for line in csv_reader:
-	# 	collection.insert_one(line)
-	# 	counter += 1 # count the number of documents
+collection.create_index([("Fine amount",1),("Issue Date",1)])
+collection.create_index([("Issue time",1),("Issue Date",1)])
+collection.create_index([("Location",1),("Issue Date",1)])
+collection.create_index([("Make",1),("Issue Date",1)])
+collection.create_index([("Issue Date",1)])
 
-
-	#Test a limited number of data entry 
-	for line in csv_reader:
-		if counter == 4:
-			break
-		else:
-			collection.insert_one(line)
-			counter += 1
-
-# Read operation
-doc_1 = collection.find({'Ticket number': "4358765025"})
-for row in doc_1:
-	print(row)
